@@ -1,0 +1,1 @@
+package goscule_test

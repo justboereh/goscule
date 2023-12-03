@@ -1,6 +1,12 @@
 package goscule
 
-var STR_SPLITTER = [4]string{"-", "_", "/", "."}
+import (
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
+
+var STR_SPLITTER = []string{"-", "_", "/", "."}
 
 func Case(arr []string, fn func(str string) string, joiner string) string {
 	result := ""
@@ -21,6 +27,7 @@ func Pascal(str string) string {
 		return ""
 	}
 
+	return PascalArray(splitByCase(str, STR_SPLITTER))
 }
 
 func PascalArray(arr []string) string {
@@ -29,7 +36,7 @@ func PascalArray(arr []string) string {
 	}
 
 	return Case(arr, func(str string) string {
-		return upperFirst(str)
+		return UpperFirst(str)
 	}, "")
 }
 
@@ -38,6 +45,15 @@ func Camel(str string) string {
 		return ""
 	}
 
+	return LowerFirst(Pascal(str))
+}
+
+func CamelArray(arr []string) string {
+	if len(arr) < 1 {
+		return ""
+	}
+
+	return LowerFirst(PascalArray(arr))
 }
 
 func Kebab(str string) string {
@@ -45,6 +61,17 @@ func Kebab(str string) string {
 		return ""
 	}
 
+	return KebabArray(splitByCase(str, STR_SPLITTER))
+}
+
+func KebabArray(arr []string) string {
+	if len(arr) < 1 {
+		return ""
+	}
+
+	return Case(arr, func(str string) string {
+		return strings.ToLower(str)
+	}, "-")
 }
 
 func Snake(str string) string {
@@ -52,18 +79,39 @@ func Snake(str string) string {
 		return ""
 	}
 
+	return SnakeArray(splitByCase(str, STR_SPLITTER))
 }
 
-func Upper(str string) string {
+func SnakeArray(arr []string) string {
+	if len(arr) < 1 {
+		return ""
+	}
+
+	return Case(arr, func(str string) string {
+		return strings.ToLower(str)
+	}, "_")
+}
+
+func UpperFirst(str string) string {
 	if len(str) < 1 {
 		return ""
 	}
 
+	_, i := utf8.DecodeRuneInString(str)
+	therest := str[i:]
+	first := unicode.ToUpper([]rune(str)[0])
+
+	return string(first) + therest
 }
 
-func Lower(str string) string {
+func LowerFirst(str string) string {
 	if len(str) < 1 {
 		return ""
 	}
 
+	_, i := utf8.DecodeRuneInString(str)
+	therest := str[i:]
+	first := unicode.ToLower([]rune(str)[0])
+
+	return string(first) + therest
 }

@@ -3,7 +3,6 @@ package goscule
 import (
 	"math"
 	"unicode"
-	"unicode/utf8"
 )
 
 func includes[T comparable](s []T, e T) bool {
@@ -27,7 +26,7 @@ func splitByCase(str string, seperators []string) []string {
 	previousUpper := false
 	previousSplitter := false
 
-	for _, char := range []rune(str) {
+	for _, char := range str {
 		isSplitter := includes(seperators, string(char))
 
 		if isSplitter {
@@ -40,14 +39,14 @@ func splitByCase(str string, seperators []string) []string {
 
 		isUpper := unicode.IsUpper(char)
 
-		if previousSplitter == false && previousUpper == false && isUpper == true {
+		if !previousSplitter && !previousUpper && isUpper {
 			parts = append(parts, buff)
 			buff = string(char)
 			previousUpper = isUpper
 			continue
 		}
 
-		if previousSplitter == false && previousUpper == true && isUpper == false && len(buff) > 1 {
+		if !previousSplitter && previousUpper && !isUpper && len(buff) > 1 {
 			parts = append(parts, buff[0:int(math.Max(0, float64(len(buff)-1)))])
 			buff = buff[:len(buff)-1] + string(char)
 			previousUpper = isUpper
@@ -63,28 +62,4 @@ func splitByCase(str string, seperators []string) []string {
 
 	return parts
 
-}
-
-func upperFirst(str string) string {
-	if len(str) < 1 {
-		return ""
-	}
-
-	_, i := utf8.DecodeRuneInString(str)
-	therest := str[i:]
-	first := unicode.ToUpper([]rune(str)[0])
-
-	return string(first) + therest
-}
-
-func lowerFirst(str string) string {
-	if len(str) < 1 {
-		return ""
-	}
-
-	_, i := utf8.DecodeRuneInString(str)
-	therest := str[i:]
-	first := unicode.ToLower([]rune(str)[0])
-
-	return string(first) + therest
 }
